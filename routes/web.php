@@ -1,28 +1,50 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\User\DashboardController as UserDashboard;
+use App\Http\Controllers\BookingsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoomsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('auth/login');
+    if (auth()->check()) {
+        return auth()->user()->role === 'admin'
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('user.dashboard');
+    }
+
+    return redirect()->route('login');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
+
+    // PROFILE
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // ADMIN
+    Route::middleware('role:admin')
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            Route::get('/dashboard', [AdminDashboard::class, 'index'])
+                ->name('dashboard');
+            Route::resource('rooms', RoomsController::class);
+            Route::resource('bookings', BookingsController::class);
+        });
+
+    // USER
+    Route::middleware('role:user')
+        ->prefix('user')
+        ->name('user.')
+        ->group(function () {
+            Route::get('/dashboard', [UserDashboard::class, 'index'])
+                ->name('dashboard');
+            Route::resource('bookings', BookingsController::class)->only([
+                'index', 'create', 'store', 'update','destroy'
+            ]);
+        });
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    });
-})->middleware(['auth', 'verified'])->name('admin.dashboard');
-
-Route::middleware(['auth', 'role:user'])->group(function () {
-    Route::get('/user/dashboard', function () {
-        return view('user.dashboard');
-    });
-})->middleware(['auth', 'verified'])->name('user.dashboard');
 
 require __DIR__.'/auth.php';

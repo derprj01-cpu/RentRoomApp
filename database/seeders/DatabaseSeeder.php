@@ -2,6 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Booking;
+use App\Models\BookingLog;
+use App\Models\Price;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,13 +19,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::factory()->create([
+        'name' => 'Admin',
+        'email' => 'admin@kampus.ac.id',
+        'role' => 'admin'
+    ]);
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+    User::factory(4)->create(['role' => 'user']);
 
-        $this->call(UserSeeder::class);
+    $rooms = Room::factory()->count(20)->create();
+    $rooms->each(function ($room) {
+        Price::factory()->count(2)->create([
+            'room_id' => $room->id,
+        ]);
+    });
+
+    $bookings = Booking::factory()->count(25)->create();
+
+    $bookings->each(function ($booking) {
+        BookingLog::factory()->count(2)->create([
+            'booking_id' => $booking->id,
+        ]);
+    });
     }
 }

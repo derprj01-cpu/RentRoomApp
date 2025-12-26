@@ -4,23 +4,22 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class roleMiddleware
+class RedirectIfAuthenticated
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, String $role): Response
+    public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check()) {
-            abort(401); // belum login
-        }
-
-        if (auth()->user()->role !== $role) {
-            abort(403,'Unauthorized'); // tidak punya akses
+            if (Auth::check()) {
+            return Auth::user()->role === 'admin'
+                ? redirect()->route('admin.dashboard')
+                : redirect()->route('user.dashboard');
         }
 
         return $next($request);
