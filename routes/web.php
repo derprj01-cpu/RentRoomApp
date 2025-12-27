@@ -21,6 +21,8 @@ Route::middleware(['auth'])->group(function () {
 
     // PROFILE
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // ADMIN
     Route::middleware('role:admin')
@@ -31,6 +33,12 @@ Route::middleware(['auth'])->group(function () {
                 ->name('dashboard');
             Route::resource('rooms', RoomsController::class);
             Route::resource('bookings', BookingsController::class);
+
+            Route::patch('bookings/{booking}/approve', [BookingsController::class, 'approve'])
+                ->name('bookings.approve');
+
+            Route::patch('bookings/{booking}/reject', [BookingsController::class, 'reject'])
+                ->name('bookings.reject');
         });
 
     // USER
@@ -41,8 +49,10 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/dashboard', [UserDashboard::class, 'index'])
                 ->name('dashboard');
             Route::resource('bookings', BookingsController::class)->only([
-                'index', 'create', 'store', 'update','destroy'
+                'index', 'create', 'store', 'update',
             ]);
+            Route::patch('bookings/cancel/{booking}', [BookingsController::class, 'cancel'])
+                ->name('bookings.cancel');
         });
 });
 

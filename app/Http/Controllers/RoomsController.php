@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,10 +13,8 @@ class RoomsController extends Controller
      */
     public function index()
     {
-
-
-        return view('admin.rooms.index',[
-            'rooms' => DB::table('rooms')->paginate(10)
+        return view('admin.rooms.index', [
+            'rooms' => Room::latest()->paginate(10)
         ]);
     }
 
@@ -24,7 +23,7 @@ class RoomsController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.rooms.create');
     }
 
     /**
@@ -32,7 +31,20 @@ class RoomsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'room_name'   => ['required', 'string', 'max:255'],
+            'location'    => ['required', 'string', 'max:255'],
+            'capacity'    => ['required', 'integer', 'min:1'],
+            'type'        => ['required', 'in:meeting,classroom,lab,ballroom'],
+            'status'      => ['required', 'in:available,unavailable'],
+            'description' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        Room::create($validated);
+
+        return redirect()
+            ->route('admin.rooms.index')
+            ->with('success', 'Room successfully created.');
     }
 
     /**
@@ -48,7 +60,8 @@ class RoomsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $room = Room::findOrFail($id);
+        return view('admin.rooms.edit', compact('room'));
     }
 
     /**
@@ -56,7 +69,20 @@ class RoomsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'room_name'   => ['required', 'string', 'max:255'],
+            'location'    => ['required', 'string', 'max:255'],
+            'capacity'    => ['required', 'integer', 'min:1'],
+            'type'        => ['required', 'in:meeting,classroom,lab,ballroom'],
+            'status'      => ['required', 'in:available,unavailable'],
+            'description' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $room = Room::findOrFail($id);
+
+        $room->update($validated);
+
+        return redirect()->route('admin.rooms.index')->with(['success' => 'Data Berhasil Diubah!']);
     }
 
     /**
@@ -64,6 +90,11 @@ class RoomsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
-    }
+        $room = Room::findOrFail($id);
+        $room->delete();
+
+        return redirect()
+            ->route('admin.rooms.index')
+            ->with('success', 'Room successfully deleted.');
+            }
 }

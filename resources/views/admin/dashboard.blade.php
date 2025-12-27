@@ -14,46 +14,44 @@
             </div>
 
             <div class="py-8">
-    <div class="mx-auto space-y-6 max-w-7xl">
+                <div class="mx-auto space-y-6 max-w-7xl">
+                    {{-- Stats --}}
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                        <div class="p-5 bg-gray-800 rounded-lg">
+                            <p class="text-sm text-gray-400">Total Rooms</p>
+                            <p class="text-3xl font-bold text-white">{{ $totalRooms }}</p>
+                        </div>
 
-        {{-- Stats --}}
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="p-5 bg-gray-800 rounded-lg">
-                <p class="text-sm text-gray-400">Total Rooms</p>
-                <p class="text-3xl font-bold text-white">{{ $totalRooms }}</p>
+                        <div class="p-5 bg-gray-800 rounded-lg">
+                            <p class="text-sm text-gray-400">Available</p>
+                            <p class="text-3xl font-bold text-green-400">{{ $availableRooms }}</p>
+                        </div>
+
+                        <div class="p-5 bg-gray-800 rounded-lg">
+                            <p class="text-sm text-gray-400">Bookings Today</p>
+                            <p class="text-3xl font-bold text-blue-400">{{ $todayBookings }}</p>
+                        </div>
+
+                        <div class="p-5 bg-gray-800 rounded-lg">
+                            <p class="text-sm text-gray-400">Active Bookings</p>
+                            <p class="text-3xl font-bold text-yellow-400">{{ $activeBookings }}</p>
+                        </div>
+                    </div>
+
+                    {{-- Quick Actions --}}
+                    <div class="flex gap-4">
+                        <a href="{{ route('admin.rooms.create') }}"
+                        class="px-4 py-2 bg-indigo-600 rounded hover:bg-indigo-700">
+                            + Add Room
+                        </a>
+
+                        <a href="{{ route('admin.bookings.create') }}"
+                        class="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700">
+                            + New Booking
+                        </a>
+                    </div>
+                </div>
             </div>
-
-            <div class="p-5 bg-gray-800 rounded-lg">
-                <p class="text-sm text-gray-400">Available</p>
-                <p class="text-3xl font-bold text-green-400">{{ $availableRooms }}</p>
-            </div>
-
-            <div class="p-5 bg-gray-800 rounded-lg">
-                <p class="text-sm text-gray-400">Bookings Today</p>
-                <p class="text-3xl font-bold text-blue-400">{{ $todayBookings }}</p>
-            </div>
-
-            <div class="p-5 bg-gray-800 rounded-lg">
-                <p class="text-sm text-gray-400">Active Bookings</p>
-                <p class="text-3xl font-bold text-yellow-400">{{ $activeBookings }}</p>
-            </div>
-        </div>
-
-        {{-- Quick Actions --}}
-        <div class="flex gap-4">
-            <a href="{{ route('admin.rooms.create') }}"
-               class="px-4 py-2 bg-indigo-600 rounded hover:bg-indigo-700">
-                + Add Room
-            </a>
-
-            <a href="{{ route('admin.bookings.create') }}"
-               class="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700">
-                + New Booking
-            </a>
-        </div>
-
-    </div>
-</div>
         </div>
     </div>
 </x-app-layout>

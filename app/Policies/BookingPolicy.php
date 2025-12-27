@@ -71,4 +71,10 @@ class BookingPolicy
     {
         return $user->role === 'admin';
     }
+
+    public function cancel(User $user, Booking $booking): bool
+    {
+        return $booking->user_id === $user->id
+            && in_array($booking->status, ['pending', 'approved']);
+    }
 }

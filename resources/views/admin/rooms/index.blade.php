@@ -6,7 +6,7 @@
             </h2>
 
             <x-primary-button>
-                {{ __('Create Room') }}
+                <a href="{{ route('admin.rooms.create') }}">Create Room</a>
             </x-primary-button>
         </div>
     </x-slot>
@@ -49,14 +49,38 @@
                                                 {{ ucfirst($room->status) }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 space-x-2 text-right">
-                                            <x-secondary-button>
-                                                Edit
-                                            </x-secondary-button>
+                                        <td class="px-6 py-4 text-right">
+                                            <x-dropdown align="right" width="48">
+                                                <x-slot name="trigger">
+                                                    <button class="inline-flex items-center justify-center w-8 h-8 text-gray-500 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none">
 
-                                            <x-danger-button>
-                                                Delete
-                                            </x-danger-button>
+                                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M6 10a2 2 0 114 0 2 2 0 01-4 0zm4-6a2 2 0 114 0 2 2 0 01-4 0zm0 12a2 2 0 114 0 2 2 0 01-4 0z"/>
+                                                    </svg>
+
+                                                    </button>
+                                                </x-slot>
+
+                                                <x-slot name="content">
+                                                    <x-dropdown-link :href="route('admin.rooms.edit', $room->id)">
+                                                        {{ __('Edit') }}
+                                                    </x-dropdown-link>
+
+                                                    <button
+                                                        @click="$dispatch('open-confirm-modal', {
+                                                            title: 'Delete Room',
+                                                            message: 'Are you sure you want to delete {{ $room->room_name }}?',
+                                                            confirmText: 'Delete',
+                                                            confirmColor: 'bg-red-600 hover:bg-red-700',
+                                                            action: '{{ route('admin.rooms.destroy', $room->id) }}',
+                                                            method: 'DELETE'
+                                                        })"
+                                                        class="block w-full px-4 py-2 text-sm leading-5 text-gray-700 transition duration-150 ease-in-out text-start dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-red-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800">
+                                                        Delete
+                                                    </button>
+
+                                                </x-slot>
+                                            </x-dropdown>
                                         </td>
                                     </tr>
                                 @empty

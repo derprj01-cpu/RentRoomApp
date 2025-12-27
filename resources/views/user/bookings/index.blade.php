@@ -5,9 +5,8 @@
                 {{ __('My Bookings') }}
             </h2>
 
-            <x-primary-button
-                onclick="window.location='{{ route('user.bookings.create') }}'">
-                + New Booking
+            <x-primary-button>
+                <a href="{{ route('user.bookings.create') }}">+ New Booking</a>
             </x-primary-button>
         </div>
     </x-slot>
@@ -87,9 +86,9 @@
 
                                                     @if ($booking->status === 'pending')
                                                         <form method="POST"
-                                                            action="{{ route('user.bookings.destroy', $booking) }}">
+                                                            action="{{ route('user.bookings.cancel', $booking->id) }}">
                                                             @csrf
-                                                            @method('DELETE')
+                                                            @method('PATCH')
 
                                                             <button type="submit"
                                                                 class="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30">
