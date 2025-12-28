@@ -23,6 +23,7 @@ class Booking extends Model
         'duration_type',
         'purpose',
         'status',
+        'google_calendar_event_id',
     ];
 
     public function room()

@@ -92,9 +92,18 @@ class BookingsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Booking $booking)
     {
-        //
+        $user = auth()->user();
+
+        // USER hanya boleh lihat booking miliknya
+        if ($user->role === 'user' && $booking->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $booking->load(['room', 'user']);
+
+        return view('bookings.show', compact('booking'));
     }
 
     /**

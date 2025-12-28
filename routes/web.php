@@ -53,7 +53,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/dashboard', [UserDashboard::class, 'index'])
                 ->name('dashboard');
             Route::resource('bookings', BookingsController::class)->only([
-                'index', 'create', 'store', 'update',
+                'index', 'show', 'create', 'store', 'update',
             ]);
             Route::patch('bookings/cancel/{booking}', [BookingsController::class, 'cancel'])
                 ->name('bookings.cancel');
