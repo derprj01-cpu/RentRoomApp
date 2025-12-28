@@ -37,6 +37,13 @@
                         >
                             Booking
                         </x-nav-link>
+
+                        <x-nav-link
+                            :href="route('calendar')"
+                            :active="request()->routeIs('calendar')"
+                        >
+                            Calendar
+                        </x-nav-link>
                     @endif
 
                     @if(Auth::user()->role === 'user')
@@ -45,6 +52,13 @@
                             :active="request()->routeIs('user.bookings.*')"
                         >
                             Booking
+                        </x-nav-link>
+
+                        <x-nav-link
+                            :href="route('calendar')"
+                            :active="request()->routeIs('calendar')"
+                        >
+                            Calendar
                         </x-nav-link>
                     @endif
                 </div>
@@ -117,6 +131,13 @@
                 >
                     Booking
                 </x-responsive-nav-link>
+s
+                <x-responsive-nav-link
+                    :href="route('calendar')"
+                    :active="request()->routeIs('calendar.*')"
+                >
+                    Calendar
+                </x-responsive-nav-link>
             @endif
 
             @if(Auth::user()->role === 'user')
@@ -125,6 +146,13 @@
                     :active="request()->routeIs('user.bookings.*')"
                 >
                     Booking
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link
+                    :href="route('calendar')"
+                    :active="request()->routeIs('calendar.*')"
+                >
+                    Calendar
                 </x-responsive-nav-link>
             @endif
         </div>

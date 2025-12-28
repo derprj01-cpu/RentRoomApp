@@ -32,7 +32,11 @@
                 @include('partials.flash')
                 @include('components.confirm-modal')
                 {{ $slot }}
+
+                @stack('scripts')
+                @stack('styles')
             </main>
         </div>
+
     </body>
 </html>

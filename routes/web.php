@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\User\DashboardController as UserDashboard;
 use App\Http\Controllers\BookingsController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomsController;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
+    Route::get('/calendar/events', [CalendarController::class, 'events'])->name('calendar.events');
 
     // ADMIN
     Route::middleware('role:admin')
@@ -39,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
 
             Route::patch('bookings/{booking}/reject', [BookingsController::class, 'reject'])
                 ->name('bookings.reject');
+
         });
 
     // USER
