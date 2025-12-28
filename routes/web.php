@@ -53,10 +53,13 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/dashboard', [UserDashboard::class, 'index'])
                 ->name('dashboard');
             Route::resource('bookings', BookingsController::class)->only([
-                'index', 'show', 'create', 'store', 'update',
+                'index', 'create', 'store', 'update',
             ]);
             Route::patch('bookings/cancel/{booking}', [BookingsController::class, 'cancel'])
                 ->name('bookings.cancel');
+                Route::get('/bookings/{booking}', [BookingsController::class, 'show'])
+                ->middleware('auth')
+                ->name('bookings.show');
         });
 });
 

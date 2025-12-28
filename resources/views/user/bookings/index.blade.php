@@ -79,7 +79,7 @@
                                                     x-transition
                                                     class="absolute right-0 z-50 mt-2 origin-top-right bg-white border border-gray-200 rounded-md shadow-lg w-36 dark:bg-gray-800 dark:border-gray-700">
 
-                                                    <a href="{{ route('user.bookings.index', $booking) }}"
+                                                    <a href="{{ route('user.bookings.show', $booking) }}"
                                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
                                                         Detail
                                                     </a>
