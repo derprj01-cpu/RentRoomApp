@@ -47,6 +47,9 @@ Route::middleware(['auth'])->group(function () {
             Route::patch('bookings/{booking}/reject', [BookingsController::class, 'reject'])
                 ->name('bookings.reject');
 
+            Route::get('/bookings/{booking}', [BookingsController::class, 'show'])
+                ->name('bookings.show');
+
         });
 
     // USER
@@ -61,9 +64,9 @@ Route::middleware(['auth'])->group(function () {
             ]);
             Route::patch('bookings/cancel/{booking}', [BookingsController::class, 'cancel'])
                 ->name('bookings.cancel');
-                Route::get('/bookings/{booking}', [BookingsController::class, 'show'])
-                ->middleware('auth')
-                ->name('bookings.show');
+            Route::get('/bookings/{booking}', [BookingsController::class, 'show'])
+            ->middleware('auth')
+            ->name('bookings.show');
         });
 });
 

@@ -139,7 +139,7 @@
                                 @endif
 
                                 <!-- View Details -->
-                                <a href="{{ route('user.bookings.show', $booking->id) }}"
+                                <a href="{{ route('admin.bookings.show', $booking->id) }}"
                                    class="flex items-center px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 border-t border-gray-100 dark:border-gray-700">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -159,15 +159,47 @@
                             </x-slot>
 
                             <x-slot name="content">
+                                @if($booking->status === 'pending')
+                                    <!-- Approve Button -->
+                                    <button
+                                        onclick="confirmAction('Approve', '{{ route('admin.bookings.approve', $booking->id) }}', 'PATCH', 'Approve this booking?')"
+                                        class="flex items-center w-full px-3 py-2 text-sm text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Approve
+                                    </button>
+
+                                    <!-- Reject Button -->
+                                    <button
+                                        onclick="confirmAction('Reject', '{{ route('admin.bookings.reject', $booking->id) }}', 'PATCH', 'Reject this booking?')"
+                                        class="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 border-t border-gray-100 dark:border-gray-700">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                        Reject
+                                    </button>
+                                @endif
+
                                 @if(in_array($booking->status, ['approved', 'pending']))
+                                    <!-- Cancel Button (for admin to cancel approved/pending bookings) -->
                                     <button
                                         onclick="confirmAction('Cancel', '{{ route('admin.bookings.reject', $booking->id) }}', 'PATCH', 'Cancel this booking?')"
-                                        class="flex items-center w-full px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20">
+                                        class="flex items-center w-full px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20 {{ $booking->status === 'pending' ? 'border-t border-gray-100 dark:border-gray-700' : '' }}">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
                                         Cancel
                                     </button>
                                 @endif
-                                <a href="{{ route('admin.bookings.approve', $booking->id) }}"
-                                   class="flex items-center px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 {{ in_array($booking->status, ['approved', 'pending']) ? 'border-t border-gray-100 dark:border-gray-700' : '' }}">
+
+                                <!-- View Details Link -->
+                                <a href="{{ route('admin.bookings.show', $booking->id) }}"
+                                class="flex items-center px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 border-t border-gray-100 dark:border-gray-700">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
                                     View Details
                                 </a>
                             </x-slot>
