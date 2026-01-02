@@ -161,12 +161,12 @@
                             <x-slot name="content">
                                 @if(in_array($booking->status, ['approved', 'pending']))
                                     <button
-                                        onclick="confirmAction('Cancel', '{{ route('user.bookings.cancel', $booking->id) }}', 'PATCH', 'Cancel this booking?')"
+                                        onclick="confirmAction('Cancel', '{{ route('admin.bookings.reject', $booking->id) }}', 'PATCH', 'Cancel this booking?')"
                                         class="flex items-center w-full px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20">
                                         Cancel
                                     </button>
                                 @endif
-                                <a href="{{ route('user.bookings.show', $booking->id) }}"
+                                <a href="{{ route('admin.bookings.approve', $booking->id) }}"
                                    class="flex items-center px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 {{ in_array($booking->status, ['approved', 'pending']) ? 'border-t border-gray-100 dark:border-gray-700' : '' }}">
                                     View Details
                                 </a>
