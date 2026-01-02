@@ -18,11 +18,11 @@ class DashboardController extends Controller
                                         ->whereIn('status', ['pending', 'approved'])
                                         ->count(),
             'todayBookings'   => Booking::where('user_id', $userId)
-                                        ->whereDate('start_time', today())
+                                        ->whereDate('booking_date', today())
                                         ->count(),
             'upcomingBookings'=> Booking::with('room')
                                         ->where('user_id', $userId)
-                                        ->whereDate('start_time', '>=', today())
+                                        ->whereDate('booking_date', '>=', today())
                                         ->orderBy('start_time')
                                         ->limit(5)
                                         ->get(),

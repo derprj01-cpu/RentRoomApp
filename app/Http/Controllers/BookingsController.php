@@ -46,7 +46,7 @@ class BookingsController extends Controller
 
             // Filter by date
             if ($request->has('date') && $request->date) {
-                $query->whereDate('bookings.start_time', $request->date);
+                $query->whereDate('bookings.booking_date', $request->date);
             }
 
             // Sorting
@@ -58,7 +58,7 @@ class BookingsController extends Controller
                 'user_name' => 'users.name',
                 'room_name' => 'rooms.room_name',
                 'location' => 'rooms.location',
-                'schedule' => 'bookings.start_time',
+                'schedule' => 'bookings.booking_date',
                 'type' => 'rooms.type',
                 'purpose' => 'bookings.purpose',
             ];
@@ -114,7 +114,7 @@ class BookingsController extends Controller
         $sortMap = [
             'room_name' => 'rooms.room_name',
             'location' => 'rooms.location',
-            'schedule' => 'start_time',
+            'schedule' => 'booking_date',
             'type' => 'rooms.type',
         ];
 
