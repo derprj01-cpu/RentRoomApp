@@ -11,11 +11,34 @@ class RoomsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.rooms.index', [
-            'rooms' => Room::latest()->paginate(10)
-        ]);
+        $query = Room::query();
+
+    if ($request->filled('search')) {
+        $query->where('room_name', 'like', '%' . $request->search . '%');
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    if ($request->filled('sort')) {
+        $query->orderBy(
+            $request->sort,
+            $request->get('direction', 'asc')
+        );
+    } else {
+        $query->latest();
+    }
+
+    $rooms = $query->paginate(10)->withQueryString();
+
+    if ($request->ajax()) {
+        return view('admin.rooms.partials.results', compact('rooms'));
+    }
+
+    return view('admin.rooms.index', compact('rooms'));
     }
 
     /**

@@ -36,6 +36,7 @@
                 @stack('scripts')
                 @stack('styles')
             </main>
+
         </div>
 
     </body>

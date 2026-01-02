@@ -44,11 +44,6 @@
                         class="px-4 py-2 bg-indigo-600 rounded hover:bg-indigo-700">
                             + Add Room
                         </a>
-
-                        <a href="{{ route('admin.bookings.create') }}"
-                        class="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700">
-                            + New Booking
-                        </a>
                     </div>
                 </div>
             </div>

@@ -131,7 +131,7 @@
                 >
                     Booking
                 </x-responsive-nav-link>
-s
+
                 <x-responsive-nav-link
                     :href="route('calendar')"
                     :active="request()->routeIs('calendar.*')"

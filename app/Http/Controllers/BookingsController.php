@@ -14,24 +14,132 @@ class BookingsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (auth()->user()->role === 'admin') {
+            $query = Booking::with(['user', 'room'])
+                ->select('bookings.*')
+                ->join('users', 'bookings.user_id', '=', 'users.id')
+                ->join('rooms', 'bookings.room_id', '=', 'rooms.id');
 
-            return view('admin.bookings.index',[
-                'bookings' => $bookings = Booking::with(['user', 'room'])
-                ->latest()
-                ->paginate(10),
+            // Search functionality
+            if ($request->has('search') && $request->search) {
+                $searchTerm = $request->search;
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('users.name', 'like', "%{$searchTerm}%")
+                    ->orWhere('users.email', 'like', "%{$searchTerm}%")
+                    ->orWhere('rooms.room_name', 'like', "%{$searchTerm}%")
+                    ->orWhere('rooms.location', 'like', "%{$searchTerm}%")
+                    ->orWhere('bookings.purpose', 'like', "%{$searchTerm}%");
+                });
+            }
+
+            // Filter by status
+            if ($request->has('status') && $request->status) {
+                $query->where('bookings.status', $request->status);
+            }
+
+            // Filter by room type
+            if ($request->has('type') && $request->type) {
+                $query->where('rooms.type', $request->type);
+            }
+
+            // Filter by date
+            if ($request->has('date') && $request->date) {
+                $query->whereDate('bookings.start_time', $request->date);
+            }
+
+            // Sorting
+            $sortBy = $request->get('sort', 'bookings.created_at');
+            $sortOrder = $request->get('direction', 'desc');
+
+            // Map frontend sort keys to database columns
+            $sortMap = [
+                'user_name' => 'users.name',
+                'room_name' => 'rooms.room_name',
+                'location' => 'rooms.location',
+                'schedule' => 'bookings.start_time',
+                'type' => 'rooms.type',
+                'purpose' => 'bookings.purpose',
+            ];
+
+            $sortColumn = $sortMap[$sortBy] ?? 'bookings.created_at';
+            $query->orderBy($sortColumn, $sortOrder);
+
+            $bookings = $query->paginate(10);
+
+            // AJAX request
+            if ($request->ajax()) {
+                return response()->json([
+                    'html' => view('admin.bookings.partials.results', compact('bookings'))->render(),
+                    'total' => $bookings->total()
+                ]);
+            }
+
+            return view('admin.bookings.index', compact('bookings'));
+        }
+
+        // User view
+        $query = Booking::with('room')
+            ->where('user_id', auth()->id());
+
+        // Search for user
+        if ($request->has('search') && $request->search) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('purpose', 'like', "%{$searchTerm}%")
+                ->orWhereHas('room', function($roomQuery) use ($searchTerm) {
+                    $roomQuery->where('room_name', 'like', "%{$searchTerm}%")
+                                ->orWhere('location', 'like', "%{$searchTerm}%");
+                });
+            });
+        }
+
+        // Filter by status for user
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by type for user
+        if ($request->has('type') && $request->type) {
+            $query->whereHas('room', function($q) use ($request) {
+                $q->where('type', $request->type);
+            });
+        }
+
+        // Sorting for user
+        $sortBy = $request->get('sort', 'created_at');
+        $sortOrder = $request->get('direction', 'desc');
+
+        $sortMap = [
+            'room_name' => 'rooms.room_name',
+            'location' => 'rooms.location',
+            'schedule' => 'start_time',
+            'type' => 'rooms.type',
+        ];
+
+        if (array_key_exists($sortBy, $sortMap)) {
+            if (in_array($sortBy, ['room_name', 'location', 'type'])) {
+                $query->join('rooms', 'bookings.room_id', '=', 'rooms.id')
+                    ->orderBy($sortMap[$sortBy], $sortOrder);
+            } else {
+                $query->orderBy($sortBy, $sortOrder);
+            }
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $bookings = $query->paginate(10);
+
+        // AJAX request for user
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('user.bookings.partials.results', compact('bookings'))->render(),
+                'total' => $bookings->total()
             ]);
         }
 
-        $bookings = Booking::with('room')
-            ->where('user_id', auth()->id())
-            ->paginate(10);
-
-        return view('user.bookings.index',[
-                'bookings' => $bookings
-            ]);
+        return view('user.bookings.index', compact('bookings'));
     }
 
     /**

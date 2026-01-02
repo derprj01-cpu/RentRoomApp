@@ -34,7 +34,11 @@ Route::middleware(['auth'])->group(function () {
         ->group(function () {
             Route::get('/dashboard', [AdminDashboard::class, 'index'])
                 ->name('dashboard');
+
+            // Route::get('/rooms/search', [RoomsController::class, 'search'])->name('rooms.search');
+
             Route::resource('rooms', RoomsController::class);
+
             Route::resource('bookings', BookingsController::class);
 
             Route::patch('bookings/{booking}/approve', [BookingsController::class, 'approve'])
