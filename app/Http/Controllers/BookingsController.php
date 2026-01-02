@@ -201,18 +201,20 @@ class BookingsController extends Controller
      * Display the specified resource.
      */
     public function show(Booking $booking)
-{
-    $user = auth()->user();
+    {
+        // Authorization check
+        if (auth()->user()->role === 'user' && $booking->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized');
+        }
 
-    // USER hanya boleh lihat booking miliknya
-    if ($user->role === 'user' && $booking->user_id !== $user->id) {
-        abort(403);
+        // Load relationships
+        $booking->load(['room', 'user']);
+
+        // For user bookings count
+        $booking->user->loadCount('bookings');
+
+        return view('bookings.show', compact('booking'));
     }
-
-    $booking->load(['room', 'user']);
-
-    return view('user.bookings.show', compact('booking'));
-}
 
     /**
      * Show the form for editing the specified resource.

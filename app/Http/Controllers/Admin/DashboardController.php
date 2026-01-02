@@ -11,14 +11,35 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('admin.dashboard', [
-            'totalRooms'   => Room::count(),
-            'availableRooms'   => Room::where('status', 'available')->count(),
-            'totalUsers'   => User::where('role', 'user')->count(),
-            'todayBookings' => Booking::whereDate('booking_date', today())->count(),
-            'totalBookings'=> Booking::count(),
-            'activeBookings'=> Booking::whereIn('status', ['pending', 'approved'])->count(),
-            'latestBookings' => Booking::latest()->limit(5)->get(),
-        ]);
+        $totalRooms = Room::count();
+        $availableRooms = Room::where('status', 'available')->count();
+
+        $todayBookings = Booking::whereDate('booking_date', today())->count();
+        $pendingBookings = Booking::where('status', 'pending')->count();
+        $activeBookings = Booking::whereIn('status', ['pending', 'approved'])
+            ->where('start_time', '>=', now())
+            ->count();
+
+        // Recent bookings (5 terbaru)
+        $recentBookings = Booking::with(['user', 'room'])
+            ->latest()
+            ->take(5)
+            ->get();
+
+        // Today's bookings list
+        $todayBookingsList = Booking::with(['user', 'room'])
+            ->whereDate('booking_date', today())
+            ->orderBy('start_time')
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'totalRooms',
+            'availableRooms',
+            'todayBookings',
+            'pendingBookings',
+            'activeBookings',
+            'recentBookings',
+            'todayBookingsList'
+        ));
     }
 }
