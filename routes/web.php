@@ -49,7 +49,11 @@ Route::middleware(['auth'])->group(function () {
 
             Route::get('/bookings/{booking}', [BookingsController::class, 'show'])
                 ->name('bookings.show');
+            Route::get('/admin/bookings/logs', [BookingsController::class, 'adminLog'])
+                ->name('bookings.logs');
 
+            Route::get('/manage-users', [AdminDashboard::class, 'manageUsers'])
+                ->name('manage-users');
         });
 
     // USER

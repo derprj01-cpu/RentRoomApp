@@ -7,22 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class BookingLog extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'booking_id',
+        'user_id',
         'action',
-        'action_by',
+        'from_status',
+        'to_status',
         'note',
     ];
 
-    public function booking()
-    {
+    public function booking() {
         return $this->belongsTo(Booking::class);
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'action_by');
+    public function user() {
+        return $this->belongsTo(User::class);
     }
 }

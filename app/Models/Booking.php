@@ -36,6 +36,17 @@ class Booking extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function log(string $action, ?string $from = null, ?string $to = null, ?string $note = null)
+    {
+        $this->logs()->create([
+            'user_id' => auth()->id(),
+            'action' => $action,
+            'from_status' => $from,
+            'to_status' => $to,
+            'note' => $note,
+        ]);
+    }
+
     public function logs()
     {
         return $this->hasMany(BookingLog::class);

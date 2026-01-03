@@ -44,6 +44,20 @@
                         >
                             Calendar
                         </x-nav-link>
+
+                        <x-nav-link
+                            :href="route('admin.bookings.logs')"
+                            :active="request()->routeIs('admin.bookings.logs')"
+                        >
+                            Logs
+                        </x-nav-link>
+
+                        <x-nav-link
+                            :href="route('admin.manage-users')"
+                            :active="request()->routeIs('admin.manage-users')"
+                        >
+                            Manage Users
+                        </x-nav-link>
                     @endif
 
                     @if(Auth::user()->role === 'user')
