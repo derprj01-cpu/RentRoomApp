@@ -47,6 +47,6 @@ Aplikasi ini dibangun menggunakan framework **Laravel** dengan konsep **MVC (Mod
 - **ORM**: Eloquent ORM
 - **API**: REST API (JSON Response)
 - **Authentication**: Laravel Auth
-- **Calendar Library**: JavaScript Calendar Plugin (berbasis API)
+- **Calendar Library**: Full Calendar ( link : https://fullcalendar.io/ ) 
 
 ---
