@@ -15,6 +15,7 @@ class CalendarController extends Controller
         $rooms = Room::all();
         $upcomingBookings = $this->getUpcomingBookings();
 
+
         return view('calendar.index', compact('events', 'rooms', 'upcomingBookings'));
     }
 

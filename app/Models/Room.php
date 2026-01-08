@@ -25,8 +25,4 @@ class Room extends Model
         return $this->hasMany(Booking::class);
     }
 
-    public function prices()
-    {
-        return $this->hasMany(Price::class);
-    }
 }

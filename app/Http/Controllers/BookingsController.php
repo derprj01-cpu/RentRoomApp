@@ -141,7 +141,7 @@ class BookingsController extends Controller
 
         return view('user.bookings.index', compact('bookings'));
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
@@ -202,25 +202,28 @@ class BookingsController extends Controller
      * Display the specified resource.
      */
     public function show(Booking $booking)
-{
-    $user = auth()->user();
+    {
+        $user = auth()->user();
 
-    // USER hanya boleh lihat booking miliknya
-    if ($user->role === 'user' && $booking->user_id !== $user->id) {
-        abort(403);
+        // USER hanya boleh lihat booking miliknya
+        if ($user->role === 'user' && $booking->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $booking->load(['room', 'user']);
+
+        return view('user.bookings.show', compact('booking'));
     }
-
-    $booking->load(['room', 'user']);
-
-    return view('user.bookings.show', compact('booking'));
-}
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Booking $booking)
     {
-        //
+        // Authorization check
+        $this->authorize('update', $booking);
+
+        return view('user.bookings.edit', compact('booking'));
     }
 
     /**
@@ -228,7 +231,97 @@ class BookingsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $booking = Booking::findOrFail($id);
+
+        // Authorization
+        $this->authorize('update', $booking);
+
+        /**
+         * ============================
+         * APPROVED / REJECTED
+         * ============================
+         * Hanya boleh edit PURPOSE
+         */
+        if (in_array($booking->status, ['approved', 'rejected'])) {
+
+            $validated = $request->validate([
+                'purpose' => 'required|string|max:500',
+            ]);
+
+            $booking->update([
+                'purpose' => $validated['purpose'],
+            ]);
+
+            return redirect()
+                ->route('user.bookings.index')
+                ->with('success', 'Booking purpose updated successfully.');
+        }
+
+        /**
+         * ============================
+         * PENDING
+         * ============================
+         * Boleh edit SEMUA
+         */
+        if ($booking->status !== 'pending') {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'room_id'       => 'required|exists:rooms,id',
+            'booking_date'  => 'required|date',
+            'start_time'    => 'required|date_format:H:i',
+            'end_time'      => 'required|date_format:H:i',
+            'duration_type' => 'required|in:6_hours,12_hours,daily',
+            'purpose'       => 'required|string|max:500',
+        ]);
+
+        // Start datetime
+        $start = Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $validated['booking_date'] . ' ' . $validated['start_time']
+        );
+
+        // Hitung end time ulang (JANGAN percaya input client)
+        $end = match ($validated['duration_type']) {
+            '6_hours'  => $start->copy()->addHours(6),
+            '12_hours' => $start->copy()->addHours(12),
+            'daily'    => $start->copy()->endOfDay(),
+        };
+
+        /**
+         * ============================
+         * CEK KONFLIK JADWAL
+         * ============================
+         */
+        $conflict = Booking::where('room_id', $validated['room_id'])
+            ->where('id', '!=', $booking->id)
+            ->where('status', '!=', 'cancelled')
+            ->where('booking_date', $validated['booking_date'])
+            ->where(function ($q) use ($start, $end) {
+                $q->where('start_time', '<', $end->format('H:i'))
+                ->where('end_time', '>', $start->format('H:i'));
+            })
+            ->exists();
+
+        if ($conflict) {
+            return back()->withErrors([
+                'booking_date' => 'Room already booked at this time.',
+            ])->withInput();
+        }
+
+        $booking->update([
+            'room_id'       => $validated['room_id'],
+            'booking_date'  => $validated['booking_date'],
+            'start_time'    => $start->format('H:i'),
+            'end_time'      => $end->format('H:i'),
+            'duration_type' => $validated['duration_type'],
+            'purpose'       => $validated['purpose'],
+        ]);
+
+        return redirect()
+            ->route('user.bookings.index')
+            ->with('success', 'Booking updated successfully.');
     }
 
     /**
@@ -269,78 +362,6 @@ class BookingsController extends Controller
         $booking->update(['status' => 'cancelled']);
 
         return back()->with('success', 'Booking cancelled successfully.');
-    }
-
-    public function adminLog(Request $request)
-    {
-        $query = Booking::query()
-            ->join('users', 'bookings.user_id', '=', 'users.id')
-            ->join('rooms', 'bookings.room_id', '=', 'rooms.id')
-            ->select([
-                'bookings.*',
-                'users.name as user_name',
-                'users.email as user_email',
-                'rooms.room_name',
-                'rooms.location',
-                'rooms.type as room_type',
-            ]);
-
-        /* =====================
-        | SEARCH (LIVE SEARCH)
-        ===================== */
-        if ($request->filled('search')) {
-            $search = $request->search;
-
-            $query->where(function ($q) use ($search) {
-                $q->where('users.name', 'like', "%{$search}%")
-                ->orWhere('users.email', 'like', "%{$search}%")
-                ->orWhere('rooms.room_name', 'like', "%{$search}%")
-                ->orWhere('rooms.location', 'like', "%{$search}%")
-                ->orWhere('bookings.purpose', 'like', "%{$search}%");
-            });
-        }
-
-        /* =====================
-        | FILTER
-        ===================== */
-        if ($request->filled('status')) {
-            $query->where('bookings.status', $request->status);
-        }
-
-        if ($request->filled('type')) {
-            $query->where('rooms.type', $request->type);
-        }
-
-        if ($request->filled('date')) {
-            $query->whereDate('bookings.booking_date', $request->date);
-        }
-
-        /* =====================
-        | SORTING
-        ===================== */
-        $sortMap = [
-            'user'     => 'users.name',
-            'room'     => 'rooms.room_name',
-            'location' => 'rooms.location',
-            'date'     => 'bookings.booking_date',
-            'status'   => 'bookings.status',
-        ];
-
-        $sortBy  = $sortMap[$request->get('sort')] ?? 'bookings.created_at';
-        $order   = $request->get('direction', 'desc');
-
-        $query->orderBy($sortBy, $order);
-
-        $bookings = $query->paginate(10)->withQueryString();
-
-        /* =====================
-        | AJAX RESPONSE
-        ===================== */
-        if ($request->ajax()) {
-            return view('admin.bookings.partials.table', compact('bookings'))->render();
-        }
-
-        return view('admin.bookings.logs', compact('bookings'));
     }
 
 }

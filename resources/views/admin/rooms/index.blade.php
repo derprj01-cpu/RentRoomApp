@@ -50,7 +50,7 @@
 
                             <!-- Status Filter -->
                             <div class="flex items-center gap-3">
-                                <select id="status-filter"
+                                <select id="status-filter"  
                                     class="p-2.5 pr-7 border border-gray-300 text-gray-600 dark:text-gray-400 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-600 dark:focus:border-blue-600">
                                     <option value="">All Status</option>
                                     <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
@@ -58,11 +58,9 @@
                                 </select>
 
                                 <!-- Clear Filters Button -->
-                                @if(request('search') || request('status'))
-                                    <button onclick="clearFilters()" class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300">
-                                        Clear
-                                    </button>
-                                @endif
+                                <button onclick="clearFilters()" class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300">
+                                    Clear
+                                </button>
                             </div>
                         </div>
                 </div>

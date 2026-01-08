@@ -10,7 +10,7 @@
                 </p>
             </div>
 
-            <div class="flex items-center text-gray-800 dark:text-gray-400 gap-3">
+            <div class="flex items-center gap-3 text-gray-800 dark:text-gray-400">
                 <!-- Filter Options -->
                 <div class="flex items-center gap-2">
                     <select id="status-filter"
@@ -50,7 +50,7 @@
     <div class="py-6">
         <div class="max-w-full px-4 mx-auto sm:px-6 lg:px-8">
             <!-- Calendar Container -->
-            <div class="overflow-hidden text-gray-800 dark:text-gray-400 bg-white shadow-sm dark:bg-gray-900 sm:rounded-lg">
+            <div class="overflow-hidden text-gray-800 bg-white shadow-sm dark:text-gray-400 dark:bg-gray-900 sm:rounded-lg">
                 <!-- Calendar Header -->
                 <div class="p-6 border-b border-gray-200 dark:border-gray-800">
                     <div class="flex flex-col items-center justify-between gap-4 md:flex-row">
@@ -116,7 +116,7 @@
                         @if($upcomingBookings->count() > 0)
                             <div class="space-y-3">
                                 @foreach($upcomingBookings as $booking)
-                                <div class="flex items-center justify-between p-3 transition-colors duration-200 bg-gray-50 rounded-lg dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800">
+                                <div class="flex items-center justify-between p-3 transition-colors duration-200 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800">
                                     <div class="flex items-center flex-1 min-w-0">
                                         <div class="flex-shrink-0 p-2 mr-3 rounded-lg
                                             @if($booking->status === 'pending') bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400
@@ -212,11 +212,11 @@
                                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Purpose</p>
                                     <p id="modal-purpose" class="mt-1 text-sm text-gray-900 dark:text-white"></p>
                                 </div>
-                                @if(auth()->user()->role === 'admin')
+
                                 <div id="modal-actions" class="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
                                     <!-- Actions will be inserted here -->
                                 </div>
-                                @endif
+                                
                             </div>
                         </div>
                     </div>
@@ -463,7 +463,7 @@
                 const actionsEl = document.getElementById('modal-actions');
                 if (actionsEl && extProps.bookingId) {
                     let actionsHTML = '';
-                    if (status === 'pending') {
+                    if (status === 'pending' && '{{ auth()->user()->role }}' === 'admin') {
                         actionsHTML = `
                             <div class="flex space-x-2">
                                 <button onclick="approveBooking(${extProps.bookingId})"
@@ -476,7 +476,7 @@
                                 </button>
                             </div>
                         `;
-                    } else if (status === 'approved') {
+                    } else if (status === 'approved' && '{{ auth()->user()->role }}' === 'user') {
                         actionsHTML = `
                             <button onclick="cancelBooking(${extProps.bookingId})"
                                     class="px-3 py-1.5 text-sm text-white bg-orange-600 rounded-lg hover:bg-orange-700">
@@ -574,60 +574,46 @@
             initCalendar(@json($events));
         });
 
+        function openConfirmModal(options) {
+            window.dispatchEvent(new CustomEvent('open-confirm-modal', {
+                detail: options
+            }));
+        }
+
         // Booking action functions
         function approveBooking(bookingId) {
-            if (confirm('Are you sure you want to approve this booking?')) {
-                submitAction(bookingId, 'approve');
-            }
+            openConfirmModal({
+                title: 'Approve Booking',
+                message: 'Are you sure you want to approve this booking?',
+                confirmText: 'Approve',
+                confirmColor: 'green',
+                actionUrl: `/admin/bookings/${bookingId}/approve`,
+                method: 'PATCH'
+            });
         }
 
         function rejectBooking(bookingId) {
-            if (confirm('Are you sure you want to reject this booking?')) {
-                submitAction(bookingId, 'reject');
-            }
+            openConfirmModal({
+                title: 'Reject Booking',
+                message: 'Are you sure you want to reject this booking?',
+                confirmText: 'Reject',
+                confirmColor: 'red',
+                actionUrl: `/admin/bookings/${bookingId}/reject`,
+                method: 'PATCH'
+            });
         }
 
         function cancelBooking(bookingId) {
-            if (confirm('Are you sure you want to cancel this booking?')) {
-                submitAction(bookingId, 'cancel');
-            }
+            openConfirmModal({
+                title: 'Cancel Booking',
+                message: 'Are you sure you want to cancel this booking?',
+                confirmText: 'Cancel',
+                confirmColor: 'yellow',
+                actionUrl: `/user/bookings/cancel/${bookingId}`,
+                method: 'PATCH'
+            });
         }
 
-        function submitAction(bookingId, action) {
-            let url, method;
-
-            if (action === 'approve') {
-                url = `/admin/bookings/${bookingId}/approve`;
-                method = 'PATCH';
-            } else if (action === 'reject') {
-                url = `/admin/bookings/${bookingId}/reject`;
-                method = 'PATCH';
-            } else if (action === 'cancel') {
-                url = `/user/bookings/cancel/${bookingId}`;
-                method = 'PATCH';
-            }
-
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = url;
-
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-            const methodInput = document.createElement('input');
-            methodInput.type = 'hidden';
-            methodInput.name = '_method';
-            methodInput.value = method;
-
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = csrfToken;
-
-            form.appendChild(methodInput);
-            form.appendChild(csrfInput);
-            document.body.appendChild(form);
-            form.submit();
-        }
     </script>
     @endpush
 </x-app-layout>

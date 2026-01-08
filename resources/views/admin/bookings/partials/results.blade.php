@@ -1,6 +1,6 @@
 <div>
     <!-- Table Info -->
-    <div class="p-3 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400">
+    <div class="p-3 text-sm text-gray-600 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400">
         {{ $bookings->total() }} bookings • Page {{ $bookings->currentPage() }} of {{ $bookings->lastPage() }}
     </div>
 
@@ -22,7 +22,7 @@
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                 <!-- User -->
                 <td class="px-3 py-3">
-                    <div class="font-medium text-gray-900 dark:text-gray-100 text-sm">
+                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {{ $booking->user->name }}
                     </div>
                     <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -70,7 +70,7 @@
 
                 <!-- Purpose -->
                 <td class="px-3 py-3">
-                    <div class="text-sm text-gray-700 dark:text-gray-300 max-w-xs truncate" title="{{ $booking->purpose }}">
+                    <div class="max-w-xs text-sm text-gray-700 truncate dark:text-gray-300" title="{{ $booking->purpose }}">
                         {{ $booking->purpose }}
                     </div>
                 </td>
@@ -93,7 +93,7 @@
 
                 <!-- Actions -->
                 <td class="px-3 py-3">
-                    <x-dropdown align="right" width="40">
+                        <x-dropdown align="right" width="40">
                         <x-slot name="trigger">
                             <button class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +106,17 @@
                             @if($booking->status === 'pending')
                                 <!-- Approve Button -->
                                 <button
-                                    onclick="confirmAction('Approve', '{{ route('admin.bookings.approve', $booking->id) }}', 'PATCH', 'Approve this booking?')"
+                                    @click.prevent.stop="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
+                                    detail: {
+                                        title: 'Approve Booking',
+                                        message: 'Approve this booking?',
+                                        confirmText: 'Approve',
+                                        type: 'success',
+                                        actionUrl: '{{ route('admin.bookings.approve', $booking->id) }}',
+                                        method: 'PATCH'
+                                    }
+                                }))
+                                "
                                     class="flex items-center w-full px-3 py-2 text-sm text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7" />
@@ -116,8 +126,18 @@
 
                                 <!-- Reject Button -->
                                 <button
-                                    onclick="confirmAction('Reject', '{{ route('admin.bookings.reject', $booking->id) }}', 'PATCH', 'Reject this booking?')"
-                                    class="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 border-t border-gray-100 dark:border-gray-700">
+                                    @click.prevent.stop="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
+                                    detail: {
+                                        title: 'Reject Booking',
+                                        message: 'Reject this booking?',
+                                        confirmText: 'Reject',
+                                        type: 'danger',
+                                        actionUrl: '{{ route('admin.bookings.reject', $booking->id) }}',
+                                        method: 'PATCH'
+                                    }
+                                }))
+                                "
+                                    class="flex items-center w-full px-3 py-2 text-sm text-red-600 border-t border-gray-100 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 dark:border-gray-700">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
@@ -125,21 +145,9 @@
                                 </button>
                             @endif
 
-                            @if(in_array($booking->status, ['approved', 'pending']))
-                                <!-- Cancel Button -->
-                                <button
-                                    onclick="confirmAction('Cancel', '{{ route('user.bookings.cancel', $booking->id) }}', 'PATCH', 'Cancel this booking?')"
-                                    class="flex items-center w-full px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20 border-t border-gray-100 dark:border-gray-700">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    Cancel
-                                </button>
-                            @endif
-
                             <!-- View Details -->
                             <a href="{{ route('admin.bookings.show', $booking->id) }}"
-                                class="flex items-center px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 border-t border-gray-100 dark:border-gray-700">
+                                class="flex items-center px-3 py-2 text-sm text-blue-600 border-t border-gray-100 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:border-gray-700">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -176,37 +184,10 @@
                 <div class="text-sm text-gray-600 dark:text-gray-400">
                     {{ $bookings->firstItem() }}-{{ $bookings->lastItem() }} of {{ $bookings->total() }}
                 </div>
-                <div class="pagination text-sm">
+                <div class="text-sm pagination">
                     {{ $bookings->appends(request()->except('page'))->links() }}
                 </div>
             </div>
         </div>
     @endif
 </div>
-
-<script>
-function confirmAction(action, url, method, message) {
-    if (confirm(message)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = url;
-
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        const methodInput = document.createElement('input');
-        methodInput.type = 'hidden';
-        methodInput.name = '_method';
-        methodInput.value = method;
-
-        const csrfInput = document.createElement('input');
-        csrfInput.type = 'hidden';
-        csrfInput.name = '_token';
-        csrfInput.value = csrfToken;
-
-        form.appendChild(methodInput);
-        form.appendChild(csrfInput);
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-</script>

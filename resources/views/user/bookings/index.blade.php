@@ -12,15 +12,15 @@
     </x-slot>
 
     <div class="py-4">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <!-- Filter Bar -->
-            <div class="mb-4 p-4 bg-white text-gray-900 dark:text-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div class="flex flex-col md:flex-row md:items-center gap-3">
+            <div class="p-4 mb-4 text-gray-900 bg-white border border-gray-200 rounded-lg dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700">
+                <div class="flex flex-col gap-3 md:flex-row md:items-center">
                     <!-- Search -->
                     <div class="flex-1">
                         <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
@@ -35,7 +35,7 @@
                     </div>
 
                     <!-- Filters -->
-                    <div class="flex items-center gap-2 flex-wrap">
+                    <div class="flex flex-wrap items-center gap-2">
                         <!-- Status Filter -->
                         <select id="status-filter"
                             class="p-2.5 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-900 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:focus:border-blue-600 dark:focus:ring-blue-600">
@@ -65,18 +65,16 @@
                         >
 
                         <!-- Clear Filters -->
-                        @if(request('search') || request('status') || request('type') || request('date'))
-                            <button onclick="clearFilters()"
-                                    class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
-                                Clear
-                            </button>
-                        @endif
+                        <button onclick="clearFilters()"
+                                class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                            Clear
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- RESULTS -->
-            <div id="bookings-results" class="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+            <div id="bookings-results" class="bg-white border border-gray-200 rounded dark:bg-gray-800 dark:border-gray-700">
                 @include('user.bookings.partials.results', ['bookings' => $bookings])
             </div>
 
@@ -107,7 +105,7 @@
             // Show loading
             resultsDiv.innerHTML = `
                 <div class="p-8 text-center text-gray-500">
-                    <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent mb-2"></div>
+                    <div class="inline-block w-5 h-5 mb-2 border-2 border-blue-500 rounded-full animate-spin border-t-transparent"></div>
                     <p class="text-sm">Loading bookings...</p>
                 </div>
             `;
@@ -175,7 +173,7 @@
             .catch(error => {
                 console.error('Error:', error);
                 resultsDiv.innerHTML = `
-                    <div class="p-8 text-center text-red-500 text-sm">
+                    <div class="p-8 text-sm text-center text-red-500">
                         Error loading bookings
                     </div>
                 `;

@@ -28,18 +28,18 @@ class DatabaseSeeder extends Seeder
     User::factory(4)->create(['role' => 'user']);
 
     $rooms = Room::factory()->count(20)->create();
-    $rooms->each(function ($room) {
-        Price::factory()->count(2)->create([
-            'room_id' => $room->id,
-        ]);
-    });
+    // $rooms->each(function ($room) {
+    //     Price::factory()->count(2)->create([
+    //         'room_id' => $room->id,
+    //     ]);
+    // });
 
     $bookings = Booking::factory()->count(25)->create();
 
-    $bookings->each(function ($booking) {
-        BookingLog::factory()->count(2)->create([
-            'booking_id' => $booking->id,
-        ]);
-    });
+    // $bookings->each(function ($booking) {
+    //     BookingLog::factory()->count(2)->create([
+    //         'booking_id' => $booking->id,
+    //     ]);
+    // });
     }
 }

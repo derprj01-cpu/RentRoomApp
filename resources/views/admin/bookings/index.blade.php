@@ -66,12 +66,10 @@
                         >
 
                         <!-- Clear Filters -->
-                        @if(request('search') || request('status') || request('type') || request('date'))
-                            <button onclick="clearFilters()"
-                                    class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
-                                Clear
-                            </button>
-                        @endif
+                        <button onclick="clearFilters()"
+                                class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                            Clear
+                        </button>
                     </div>
                 </div>
             </div>

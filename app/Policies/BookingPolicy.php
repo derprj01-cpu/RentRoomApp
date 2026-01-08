@@ -21,7 +21,8 @@ class BookingPolicy
      */
     public function view(User $user, Booking $booking): bool
     {
-        return $user->role === 'admin' || $booking->user_id === $user->id;
+        return $user->role === 'admin'
+            || $booking->user_id === $user->id;
     }
 
     /**
@@ -37,7 +38,13 @@ class BookingPolicy
      */
     public function update(User $user, Booking $booking): bool
     {
-        return $user->role === 'admin' || $booking->user_id === $user->id;
+        // Admin can update any booking
+        if ($user->role === 'user') {
+            return true;
+        }
+
+        // User can only update their own pending bookings
+        return $booking->user_id === $user->id && $booking->status === 'pending' || $booking->status === 'approved';
     }
 
     /**
@@ -72,8 +79,17 @@ class BookingPolicy
         return $user->role === 'admin';
     }
 
+    /**
+     * Determine whether the user can cancel the model.
+     */
     public function cancel(User $user, Booking $booking): bool
     {
+        // Admin can cancel any booking
+        if ($user->role === 'user') {
+            return true;
+        }
+
+        // User can cancel their own pending or approved bookings
         return $booking->user_id === $user->id
             && in_array($booking->status, ['pending', 'approved']);
     }

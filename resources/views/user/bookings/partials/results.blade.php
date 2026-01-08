@@ -45,7 +45,7 @@
 
                     <!-- Purpose -->
                     <td class="px-4 py-3">
-                        <div class="max-w-xs text-sm text-gray-700 dark:text-gray-300 truncate" title="{{ $booking->purpose }}">
+                        <div class="max-w-xs text-sm text-gray-700 truncate dark:text-gray-300" title="{{ $booking->purpose }}">
                             {{ $booking->purpose }}
                         </div>
                     </td>
@@ -77,11 +77,34 @@
 
                             <x-slot name="content">
 
-                                @if(in_array($booking->status, ['approved', 'pending']))
+                                @if(in_array($booking->status, ['approved','pending']))
+                                 <!-- Edit Button -->
+                                    <x-dropdown-link href="{{ route('user.bookings.edit', $booking->id) }}"
+                                                class="flex items-center px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <svg class="w-4 h-4 mr-2 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit
+                                    </x-dropdown-link>
+
+                                @endif
+
+                                @if(in_array($booking->status, ['pending']))
+
                                     <!-- Cancel Button (for admin to cancel approved/pending bookings) -->
                                     <button
-                                        onclick="confirmAction('Cancel', '{{ route('admin.bookings.reject', $booking->id) }}', 'PATCH', 'Cancel this booking?')"
-                                        class="flex items-center w-full px-3 py-2 text-sm text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20 {{ $booking->status === 'pending' ? 'border-t border-gray-100 dark:border-gray-700' : '' }}">
+                                        @click.prevent.stop="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
+                                        detail: {
+                                            title: 'Cancel Booking',
+                                            message: 'Cancel this booking?',
+                                            confirmText: 'Cancel',
+                                            type: 'danger',
+                                            actionUrl: '{{ route('user.bookings.cancel', $booking->id) }}',
+                                            method: 'PATCH'
+                                        }
+                                    }))
+                                    "
+                                        class="flex items-center w-full px-3 py-2 text-sm text-red-600 border-t border-gray-100 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 dark:border-gray-700">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
                                         </svg>
@@ -90,13 +113,13 @@
                                 @endif
 
                                 <!-- View Details Link -->
-                                <a href="{{ route('admin.bookings.show', $booking->id) }}"
-                                class="flex items-center px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 border-t border-gray-100 dark:border-gray-700">
+                                <a href="{{ route('user.bookings.show', $booking->id) }}"
+                                class="flex items-center px-3 py-2 text-sm text-blue-600 border-t border-gray-100 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 dark:border-gray-700">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
-                                    View Details
+                                    Details
                                 </a>
                             </x-slot>
                         </x-dropdown>

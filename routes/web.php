@@ -24,6 +24,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/destroy', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // CALENDAR
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
     Route::get('/calendar/events', [CalendarController::class, 'events'])->name('calendar.events');
 
@@ -35,25 +37,15 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/dashboard', [AdminDashboard::class, 'index'])
                 ->name('dashboard');
 
-            // Route::get('/rooms/search', [RoomsController::class, 'search'])->name('rooms.search');
-
+            // Rooms
             Route::resource('rooms', RoomsController::class);
 
-            Route::resource('bookings', BookingsController::class);
-
+            // Bookings
+            Route::resource('bookings', BookingsController::class)->except(['create', 'store']);
             Route::patch('bookings/{booking}/approve', [BookingsController::class, 'approve'])
                 ->name('bookings.approve');
-
             Route::patch('bookings/{booking}/reject', [BookingsController::class, 'reject'])
                 ->name('bookings.reject');
-
-            Route::get('/bookings/{booking}', [BookingsController::class, 'show'])
-                ->name('bookings.show');
-            Route::get('/admin/bookings/logs', [BookingsController::class, 'adminLog'])
-                ->name('bookings.logs');
-
-            Route::get('/manage-users', [AdminDashboard::class, 'manageUsers'])
-                ->name('manage-users');
         });
 
     // USER
@@ -63,16 +55,15 @@ Route::middleware(['auth'])->group(function () {
         ->group(function () {
             Route::get('/dashboard', [UserDashboard::class, 'index'])
                 ->name('dashboard');
+
+            // Bookings for user
             Route::resource('bookings', BookingsController::class)->only([
-                'index', 'create', 'store', 'update',
+                'index', 'create', 'store', 'edit', 'update', 'show'
             ]);
-            Route::patch('bookings/cancel/{booking}', [BookingsController::class, 'cancel'])
+
+            Route::patch('bookings/{booking}/cancel', [BookingsController::class, 'cancel'])
                 ->name('bookings.cancel');
-            Route::get('/bookings/{booking}', [BookingsController::class, 'show'])
-            ->middleware('auth')
-            ->name('bookings.show');
         });
 });
-
 
 require __DIR__.'/auth.php';
